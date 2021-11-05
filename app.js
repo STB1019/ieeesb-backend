@@ -6,10 +6,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const User = require("./models/user");
+const config = require("./config.json");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-const dbURI = "mongodb+srv://stb01019:Kx7RNiWbLNYL4cpW@stb01019.zwwac.mongodb.net/IEEEwebsite?retryWrites=true&w=majority";
+const dbURI = config.dbUri
 
 // Passandogli il link del database mi connetto ad esso. Infine lil metodo 'connect()'
 // è una funzione asincrona ('https://www.youtube.com/watch?v=ZcQyJ-gxke0' qui è
