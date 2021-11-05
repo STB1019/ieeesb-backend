@@ -1,0 +1,23 @@
+{
+  "name": "site",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "mocha --reporter spec",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "prepare": "husky install"
+  },
+  "author": "Christian Langellotti, Roberto Filippini, Alessandro Muscio",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^6.0.12"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "husky": "^7.0.4",
+    "mocha": "^9.1.3"
+  }
+}
