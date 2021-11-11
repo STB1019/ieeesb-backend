@@ -5,33 +5,15 @@
 // di default di 'NodeJS' quindi non vedo perché non usarli.
 const express = require("express");
 const mongoose = require("mongoose");
-const User = require("./models/user");
 const config = require("./config.json");
-// Utilizzo "multer" per gestire l'upload dei file 
-const multer = require("multer");
-const path = require("path");
 const fs = require("fs");
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8081;
 const dbURI = config.dbUri
-// Imposto dove salvare l'immagine e che nome dargli; poi imposto anche un filtro
-// per controllare l'estensione del file
-const imageStorage = multer.diskStorage({
-  destination: "./uploads",
-  filename: (req, file, cb) => {
-    cb(null, file.fieldname + "_" + Date.now() + path.extname(file.originalname));
-  }
-});
-const upload = multer({
-  storage: imageStorage,
-  fileFilter: (req, file, cb) => {
-    if(path.extname(file.originalname).match(/[\/.](gif|jpg|jpeg|tiff|png)$/i))
-      return cb(null, true);
 
-    cb(new Error("The file must be an image!"));
-  }
-});
+const articlesRoute = require("./src/routes/articlesRoutes");
+
 
 // Passandogli il link del database mi connetto ad esso. Infine il metodo 'connect()'
 // è una funzione asincrona ('https://www.youtube.com/watch?v=ZcQyJ-gxke0' qui è
@@ -63,33 +45,4 @@ const base64_encode = (file) => {
   return Buffer.from(bitmap).toString("base64");
 };
 
-// Metodo che gestisce una richiesta di tipo 'POST' alla route '/post'.
-app.post("/articles", upload.array("images"), (req, res) => {
-  let images = req.files;
-
-  console.log(images, req.body);
-
-  /*images.forEach(image => {
-    let encoded = base64_encode(image.path);
-    console.log(encoded);
-  });*/
-
-  // Come dicevo prima, prendo i dati inviati dal form, che sono stati salvati dal
-  // middleware nel body della richiesta, e li salvo in una variabile.
-  //const POST = req.body; TO UNCOMMENT
-  // Creo un oggetto di tipo User, come attributo il costruttore prende un oggetto che
-  // è uguale allo Schema che abbiamo definito nel model.
-  /*const user = new User({
-    username: POST["username"],
-    password: POST["password"]
-  }); TO UNCOMMENT */ 
-
-  // Con il metodo 'save()' salviamo nella collections questo oggetto. Anche save è
-  // asincrono, quindi stesso discorso di 'connect()' con 'then()' e 'catch()'.
-  /*user.save()
-  .then((result) => res.send("<p>Aggiunta con successo l'oggetto " + result + " </p>"))
-  .catch((error) => console.log(error)); TO UNCOMMENT */
-
-  // Ritorno alla homepage
-  res.redirect("/");
-});
+app.use(articlesRoute)
