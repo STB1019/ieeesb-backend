@@ -12,7 +12,7 @@ const router = Router()
 const imageStorage = multer.diskStorage({
     destination: "./uploads",
     filename: (req, file, cb) => {
-      cb(null, file.fieldname + "_" + Date.now() + path.extname(file.originalname));
+      cb(null, Date.now() + path.extname(file.originalname));
     }
   });
   const upload = multer({

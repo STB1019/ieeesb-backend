@@ -1,8 +1,9 @@
-// Metodo che gestisce una richiesta di tipo 'POST' alla route '/post'.
-module.exports.printImages = (req, res) => {
+const controller = {
+  // Metodo che gestisce una richiesta di tipo 'POST' alla route '/post'.
+  printImages: (req, res) => {
     let images = req.files;
   
-    console.log(images, req.body);
+    res.send(images);
   
     /*images.forEach(image => {
       let encoded = base64_encode(image.path);
@@ -26,5 +27,8 @@ module.exports.printImages = (req, res) => {
     .catch((error) => console.log(error)); TO UNCOMMENT */
   
     // Ritorno alla homepage
-    res.redirect("/");
+    //res.redirect("/"); TO UNCOMMENT
   }
+};
+
+module.exports = controller;

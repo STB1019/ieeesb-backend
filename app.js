@@ -14,21 +14,6 @@ const dbURI = config.dbUri
 
 const articlesRoute = require("./src/routes/articlesRoutes");
 
-
-// Passandogli il link del database mi connetto ad esso. Infine il metodo 'connect()'
-// è una funzione asincrona ('https://www.youtube.com/watch?v=ZcQyJ-gxke0' qui è
-// spiegato bene cosa vuol dire). In breve, JavaScript, invece che aspettare che il
-// metodo finisca la sua esecuzione, continua ad eseguire il resto del file e noi
-// volendo possiamo aggiungere una funzione di callback per dirgli cosa fare una
-// volta che il metodo ha concluso la sua esecuzione.
-// mongoose.connect(dbURI) TO UNCOMMENT
-// Con il metodo 'then()' possiamo specificare la funzione di callback da dare ad
-// una funzione asincrona. In questo caso faccio in modo che il server inizi ad
-// ascoltare le richieste solo dopo che la connessione con il DB è andata a buon fine.
-// Mentre usiamo 'catch()' per "prendere" eventuali errori.
-/*.then((result) => app.listen(PORT, console.log(`Server started on port ${PORT}...`)))
-.catch((error) => console.log(error)); TO UNCOMMENT */
-
 app.listen(PORT, console.log(`Server started on port ${PORT}...`)) // TO REMOVE
 
 // Utilizziamo il metodo 'use()' per creare un "middleware", codice che viene eseguito
