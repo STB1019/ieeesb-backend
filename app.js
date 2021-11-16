@@ -4,7 +4,6 @@
 // di 'mongoose', tuttavia entrambi ci semplificano la vita rispetto ai pacchetti
 // di default di 'NodeJS' quindi non vedo perché non usarli.
 const express = require("express");
-const mongoose = require("mongoose");
 const config = require("./config.json");
 const fs = require("fs");
 

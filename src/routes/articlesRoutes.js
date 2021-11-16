@@ -25,6 +25,6 @@ const imageStorage = multer.diskStorage({
     }
   });
 
-router.post("/articles", upload.array("images"), articlesController.printImages);
+router.post("/articles", upload.single("image"), articlesController.postArticle);
 
 module.exports = router;
