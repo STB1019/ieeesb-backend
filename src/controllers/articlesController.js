@@ -36,6 +36,32 @@ const controller = {
     .then((result) => res.send(article["_id"]))
     // Stampo il risultato in console in caso di errore (da rivedere)
     .catch((error) => console.log(error));
+  },
+  getArticles: (req, res) => {
+    // Il metodo find ritorna una lista con tutti gli articoli presenti nel DB
+    // è possibile utilizzare 'skip' e 'limit' per la paginazione. 'skip' indica quanti 
+    // elementi del database saltare mentre 'limit' indica quanti elementi possono
+    // stare in una singola pagina. 
+    Article.find()//.skip(0).limit(5)
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  },
+  getArticleById: (req, res) => {
+    // Grazie a questo posso prendere i route parameters di questa route
+    let id = req.params.id;
+
+    // findById ritorna l'articolo che corrisponde a quell'id
+    Article.findById(id)
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
   }
 };
 

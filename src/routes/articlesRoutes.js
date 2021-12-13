@@ -26,5 +26,7 @@ const imageStorage = multer.diskStorage({
   });
 
 router.post("/articles", upload.single("image"), articlesController.postArticle);
+router.get("/articles", articlesController.getArticles);
+router.get("/articles/:id", articlesController.getArticleById);
 
 module.exports = router;
