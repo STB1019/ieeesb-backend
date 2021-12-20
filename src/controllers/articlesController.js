@@ -38,12 +38,19 @@ const controller = {
     .catch((error) => console.log(error));
   },
   getArticles: (req, res) => {
+    let data = req.body;
+
+    let pageNumber = data["pageNumber"];
+    let numArticlesSinglePage = data["numArticlesSinglePage"];
+
+    let skip = (pageNumber-1)*numArticlesSinglePage;
+
     // Il metodo find ritorna una lista con tutti gli articoli presenti nel DB
     // è possibile utilizzare 'skip' e 'limit' per la paginazione. 'skip' indica quanti 
     // elementi del database saltare mentre 'limit' indica quanti elementi possono
     // stare in una singola pagina. 
-    Article.find()//.skip(0).limit(5)
-    .then((result) => {
+    Article.find().skip(skip).limit(numArticlesSinglePage)
+    .then((result) => {zz
       res.send(result);
     })
     .catch((err) => {
