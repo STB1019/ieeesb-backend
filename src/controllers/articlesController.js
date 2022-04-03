@@ -45,12 +45,12 @@ const controller = {
 
     let skip = (pageNumber-1)*numArticlesSinglePage;
 
-    console.log(skip, numArticlesSinglePage);
-
     // Il metodo find ritorna una lista con tutti gli articoli presenti nel DB
     // è possibile utilizzare 'skip' e 'limit' per la paginazione. 'skip' indica quanti 
     // elementi del database saltare mentre 'limit' indica quanti elementi possono
-    // stare in una singola pagina. 
+    // stare in una singola pagina.
+    /* Non capisco perché così non funziona, ma se metto i "magic number" al posto delle variabili
+    funziona :( */
     Article.find().skip(skip).limit(numArticlesSinglePage)
     .then((result) => {
       res.send(result);
