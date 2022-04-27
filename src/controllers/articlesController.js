@@ -16,6 +16,20 @@ mongoose.connect(dbURI)
 .then((result) => console.log("All good!"))
 .catch((error) => console.log(error));
 
+function updateQuery(previousArticle, article) {
+  let query = "{ ";
+
+  if(previousArticle["title"] !== article["title"])
+    query += "title: \"" + article["title"] + "\"";
+  if(previousArticle["content"] !== article["content"])
+    query += ", content: \"" + article["content"] + "\"";
+  if(previousArticle["thumbnail"] !== article["thumbnail"])
+    query += ", thumbnail: \"" + article["thumbnail"] + "\"";
+
+  query += " }";
+  return query;
+}
+
 const controller = {
   // Metodo che gestisce una richiesta di tipo 'POST' alla route '/post'.
   patchArticle: (req, res) => {
@@ -23,19 +37,18 @@ const controller = {
     let file = req.file;
     let data = req.body;
   
+    // Prendo l'articolo precedente e il suo id
+    let previousArticle = JSON.parse(data["previousArticle"]);
+    let id = req.params.id;
     // Creo un articolo secondo lo Schema creato
     let article = new Article({
       title: data["title"],
       content: data["content"],
-      thumbnail: file["path"]
+      //thumbnail: file["path"]
+      thumbnail: data["thumbnail"]
     });
 
-    // Salvo l'articolo all'interno del database
-    article.save()
-    // Invio come risposta l'id dell'articolo in caso di successo
-    .then((result) => res.send(article["_id"]))
-    // Stampo il risultato in console in caso di errore (da rivedere)
-    .catch((error) => console.log(error));
+    article.updateOne({ _id: "61b71fe6c9a978e145424069" }, updateQuery(previousArticle, article));
   }
 };
 
