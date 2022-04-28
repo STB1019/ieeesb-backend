@@ -15,16 +15,17 @@ const imageStorage = multer.diskStorage({
       cb(null, Date.now() + path.extname(file.originalname));
     }
   });
-  const upload = multer({
+
+const upload = multer({
     storage: imageStorage,
     fileFilter: (req, file, cb) => {
       if(path.extname(file.originalname).match(/[\/.](gif|jpg|jpeg|tiff|png)$/i))
         return cb(null, true);
   
-      cb(new Error("The file must be an image!"));
+      cb(new Error("Il file deve essere un'immagine!"));
     }
   });
 
-router.post("/articles", upload.single("image"), articlesController.postArticle);
+router.post("/articles", upload.single("thumbnail"), articlesController.postArticle);
 
 module.exports = router;
