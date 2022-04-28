@@ -16,42 +16,23 @@ mongoose.connect(dbURI)
 .then((result) => console.log("All good!"))
 .catch((error) => console.log(error));
 
-const controller = {
-  // Metodo che gestisce una richiesta di tipo 'POST' alla route '/post'.
-  postArticle: (req, res) => {
-    // Prendo i dati inviati dal form. I file se c'è ne sono e poi i campi testuali
-    let file = req.file;
-    let data = req.body;
-  
-    // Creo un articolo secondo lo Schema creato
-    let article = new Article({
-      title: data["title"],
-      content: data["content"],
-      thumbnail: file["path"]
-    });
-
-    // Salvo l'articolo all'interno del database
-    article.save()
-    // Invio come risposta l'id dell'articolo in caso di successo
-    .then((result) => res.send(article["_id"]))
-    // Stampo il risultato in console in caso di errore (da rivedere)
-    .catch((error) => console.log(error));
-  },
+const controller = {  
   getArticles: (req, res) => {
     let data = req.query;
 
-    let pageNumber = data["pageNumber"];
-    let numArticlesSinglePage = data["numArticlesSinglePage"];
+    let page = data["page"];
+    let step = data["step"];
 
-    let skip = (pageNumber-1)*numArticlesSinglePage;
+    let skip = (page-1)*step; 
 
+    console.log(skip, step);
     // Il metodo find ritorna una lista con tutti gli articoli presenti nel DB
     // è possibile utilizzare 'skip' e 'limit' per la paginazione. 'skip' indica quanti 
     // elementi del database saltare mentre 'limit' indica quanti elementi possono
     // stare in una singola pagina.
     /* Non capisco perché così non funziona, ma se metto i "magic number" al posto delle variabili
     funziona :( */
-    Article.find().skip(skip).limit(numArticlesSinglePage)
+    Article.find().skip(skip).limit(step)
     .then((result) => {
       res.send(result);
     })
