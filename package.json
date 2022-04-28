@@ -8,7 +8,7 @@
     "start": "nodemon app.js",
     "prepare": "husky install"
   },
-  "author": "Christian Langellotti, Roberto Filippini, Alessandro Muscio",
+  "author": "Alessandro Muscio",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
