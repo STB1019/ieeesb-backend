@@ -6,7 +6,6 @@
   "scripts": {
     "test": "mocha --reporter spec",
     "start": "nodemon app.js",
-    "dev": "nodemon app.js",
     "prepare": "husky install"
   },
   "author": "Alessandro Muscio",
