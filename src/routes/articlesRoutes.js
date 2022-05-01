@@ -7,8 +7,8 @@ const articlesController = require("../controllers/articlesController");
 const router = Router()
 
 
-// Imposto dove salvare l'immagine e che nome dargli; poi imposto anche un filtro
-// per controllare l'estensione del file
+// Imposto dove salvare l'immagine e che nome dargli; poi creo l'oggetto per caricare i file e
+// anche il filtro per filtrare solo le immagini
 const imageStorage = multer.diskStorage({
     destination: "./uploads",
     filename: (req, file, cb) => {
