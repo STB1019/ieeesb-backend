@@ -9,7 +9,7 @@ const router = Router()
 
 // Imposto dove salvare l'immagine e che nome dargli; poi creo l'oggetto per caricare i file e
 // anche il filtro per filtrare solo le immagini
-const imageStorage = multer.diskStorage({
+/*const imageStorage = multer.diskStorage({
     destination: "./uploads",
     filename: (req, file, cb) => {
       cb(null, Date.now() + path.extname(file.originalname));
@@ -24,7 +24,9 @@ const upload = multer({
   
       cb(new Error("Il file deve essere un'immagine!"));
     }
-  });
+  });*/
+// Salva l'immagine nella RAM invece che su disco
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.post("/articles", upload.single("thumbnail"), articlesController.postArticle);
 
