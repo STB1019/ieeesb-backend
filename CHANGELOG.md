@@ -1,3 +1,15 @@
+# [1.1.0](https://github.com/STB1019/ieeesb-backend/compare/v1.0.1...v1.1.0) (2022-05-02)
+
+
+### Bug Fixes
+
+* fixed gitignore ([ba6334f](https://github.com/STB1019/ieeesb-backend/commit/ba6334f11ef03b740b58fa271f1ba7a288f55d5e))
+
+
+### Features
+
+* added the possibility to delete an article ([4bdfcf4](https://github.com/STB1019/ieeesb-backend/commit/4bdfcf45ea856a8c414fbf4d9d085c3aa1460947))
+
 ## [1.0.1](https://github.com/STB1019/ieeesb-backend/compare/v1.0.0...v1.0.1) (2021-11-06)
 
 
