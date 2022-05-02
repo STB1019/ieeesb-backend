@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const dbURI = require("../../config.json").dbUri;
 const Article = require("../models/article");
+const sharp = require("sharp");
 
 // Passandogli il link del database mi connetto ad esso. Infine il metodo 'connect()'
 // è una funzione asincrona ('https://www.youtube.com/watch?v=ZcQyJ-gxke0' qui è
@@ -22,7 +23,14 @@ const controller = {
     // Prendo i dati inviati dal form. I file se c'è ne sono e poi i campi testuali
     let file = req.file;
     let data = req.body;
-  
+    
+    sharp(file["path"])
+    .webp()
+    .toFile("../../uploads/" + Date.now() + ".webp", (err, info) => {
+      if(err)
+        console.log(err);
+    });
+
     // Creo un articolo secondo lo Schema creato
     let article = new Article({
       title: data["title"],
