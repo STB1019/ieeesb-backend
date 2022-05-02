@@ -27,7 +27,7 @@ const controller = {
     // Invio come risposta una stringa "OK!"
     .then((result) => res.send("OK!"))
     // Stampo il risultato in console in caso di errore (da rivedere)
-    .catch((error) => console.lo<password>g(error));
+    .catch((error) => console.log(error));
   }
 };
 
