@@ -24,9 +24,8 @@ const controller = {
     // passata un buffer rappresentante l'immagine.
     let file = req.file;
     let data = req.body;
-    console.log(file);
+    
     let objectID = data.objectID;
-
     delete data.objectID;
 
     Article.findOneAndUpdate(
