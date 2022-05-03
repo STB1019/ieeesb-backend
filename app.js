@@ -4,12 +4,9 @@
 // di 'mongoose', tuttavia entrambi ci semplificano la vita rispetto ai pacchetti
 // di default di 'NodeJS' quindi non vedo perché non usarli.
 const express = require("express");
-const config = require("./config.json");
-const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 8081;
-const dbURI = config.dbUri
 
 const articlesRoute = require("./src/routes/articlesRoutes");
 
