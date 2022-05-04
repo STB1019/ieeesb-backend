@@ -20,8 +20,8 @@ const controller = {
   getArticles: (req, res) => {
     let data = req.query;
 
-    let page = data["page"];
-    let step = data["step"];
+    let page = parseInt(data["page"],10);
+    let step = parseInt(data["step"],10);
 
     let skip = (page-1)*step; 
 
