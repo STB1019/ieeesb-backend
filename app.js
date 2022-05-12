@@ -8,7 +8,7 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8081;
 
-const articlesRoute = require("./src/routes/articlesRoutes");
+const articlesRoute = require("./src/routes/articlesRoutes")
 
 app.listen(PORT, console.log(`Server started on port ${PORT}...`));
 

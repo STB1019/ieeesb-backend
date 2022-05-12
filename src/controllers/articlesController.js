@@ -46,7 +46,7 @@ const controller = {
     // Salvo l'articolo all'interno del database
     article.save()
     // Invio come risposta l'id dell'articolo in caso di successo
-    .then((result) => res.send(article["_id"]))
+    .then(() => res.send(article["_id"]))
     // Stampo il risultato in console in caso di errore (da rivedere)
     .catch((error) => console.log(error));
   }
