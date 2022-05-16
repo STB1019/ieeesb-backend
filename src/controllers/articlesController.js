@@ -9,12 +9,12 @@ const sharp = require("sharp");
 // continua ad eseguire il resto del file e noi volendo possiamo aggiungere una funzione di
 // callback per dirgli cosa fare una volta che il metodo ha concluso la sua esecuzione.
 mongoose.connect(dbURI)
-// Con il metodo 'then()' possiamo specificare la funzione di callback da dare ad una funzione
-// asincrona. In questo caso faccio in modo che il server inizi ad ascoltare le richieste solo dopo
-// che la connessione con il DB è andata a buon fine. Mentre usiamo 'catch()' per "prendere"
-// eventuali errori.
-.then((result) => console.log("All good!"))
-.catch((error) => console.log(error));
+  // Con il metodo 'then()' possiamo specificare la funzione di callback da dare ad una funzione
+  // asincrona. In questo caso faccio in modo che il server inizi ad ascoltare le richieste solo dopo
+  // che la connessione con il DB è andata a buon fine. Mentre usiamo 'catch()' per "prendere"
+  // eventuali errori.
+  .then(() => console.log("All good!"))
+  .catch((error) => console.log(error));
 
 const controller = {
   // Metodo che gestisce una richiesta di tipo 'PATCH' alla route '/articles/:id'.
@@ -24,18 +24,31 @@ const controller = {
     // passata un buffer rappresentante l'immagine.
     let file = req.file;
     let data = req.body;
-    
-    let objectID = data.objectID;
-    delete data.objectID;
 
+    let objectID = req.params.id;
+
+    // Genero il percorso dove salvare l'immagine (da rivedere)
+    let path = "./uploads/" + Date.now() + ".webp";
+    // Utilizzo 'sharp', un modulo che mi permette di manipolare le immagini, per:
+    // 1. Prendere il buffer;
+    // 2. Convertirlo in 'webp', se necessario;
+    // 3. Far diventare il buffer un file e salvarlo su disco nel percorso specificato.
+    if (file.mimetype !== "image/webp")
+      sharp(file.buffer).webp().toFile(path);
+    else
+      sharp(file.buffer).toFile(path);
+
+    let thumbnail = {thumbnail: path};
+    Object.assign(data, thumbnail);
+    console.log(data);
     Article.findOneAndUpdate(
       { _id: objectID },
       data,
       { new: true }
     )
-    .then((result) => res.send("OK!"))
-    // Stampo il risultato in console in caso di errore (da rivedere)
-    .catch((error) => console.log(error));;
+      .then(() => res.send("OK!"))
+      // Stampo il risultato in console in caso di errore (da rivedere)
+      .catch((error) => console.log(error));;
   }
 };
 
