@@ -12,7 +12,7 @@ const router = Router();
       cb(null, Date.now() + path.extname(file.originalname));
     }
   });
-
+  
 const upload = multer({
     storage: imageStorage,
     fileFilter: (req, file, cb) => {
@@ -37,5 +37,7 @@ router.get("/articles/:id", articlesController.getArticleById);
 // Associo ad una richiesta di tipo 'POST' sulla route '/articles' alla funzione
 // 'postArticle' del controller
 router.post("/articles", upload.single("thumbnail"), articlesController.postArticle);
+
+router.patch("/articles/:id", upload.single("thumbnail"), articlesController.patchArticle);
 
 module.exports = router;

@@ -19,4 +19,5 @@ app.listen(PORT, console.log(`Server started on port ${PORT}...`));
 // metodo che gestisce la specifica route a cui la richiesta è stata effettuata.
 // Il pezzo qui sopra lo tengo perché può tornare utile ma usando "multer" questo lo fai
 // lui in automatico.
-app.use(articlesRoute);
+app.use(express.urlencoded({ extended: true }));
+app.use(articlesRoute)
