@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 8081;
 
 const articlesRoute = require("./src/routes/articlesRoutes");
 
-app.listen(PORT, console.log(`Server started on port ${PORT}...`)) // TO REMOVE
+app.listen(PORT, console.log(`Server started on port ${PORT}...`));
 
 // Utilizziamo il metodo 'use()' per creare un "middleware", codice che viene eseguito
 // indipendentemente dalla route che viene richiesta. In questo caso creiamo un
