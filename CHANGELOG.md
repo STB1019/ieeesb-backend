@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/STB1019/ieeesb-backend/compare/v1.2.0...v1.3.0) (2022-05-18)
+
+
+### Bug Fixes
+
+* post article now working ([42ee7c8](https://github.com/STB1019/ieeesb-backend/commit/42ee7c839c5db3e2ae3af3051f17f6262c9d6b49))
+
+
+### Features
+
+* now images are converted in webp format before being saved ([fface1e](https://github.com/STB1019/ieeesb-backend/commit/fface1ea4ea81240a6f51cb90a804325253de1ff))
+
 # [1.2.0](https://github.com/STB1019/ieeesb-backend/compare/v1.1.0...v1.2.0) (2022-05-18)
 
 
