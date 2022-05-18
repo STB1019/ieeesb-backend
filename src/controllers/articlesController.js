@@ -1,12 +1,13 @@
 const mongoose = require("mongoose");
 const dbURI = require("../../config.json").dbUri;
 const Article = require("../models/article");
+const sharp = require("sharp");
 
-// Passandogli il link del database mi connetto ad esso. Infine il metodo 'connect()' è una funzione
-// asincrona ('https://www.youtube.com/watch?v=ZcQyJ-gxke0' qui è spiegato bene cosa vuol dire). In
-// breve, JavaScript, invece che aspettare che il metodo finisca la sua esecuzione, continua ad
-// eseguire il resto del file e noi volendo possiamo aggiungere una funzione di callback per dirgli
-// cosa fare una volta che il metodo ha concluso la sua esecuzione.
+// Passandogli il link del database mi connetto ad esso. Infine il metodo 'connect()' è una
+// funzione asincrona ('https://www.youtube.com/watch?v=ZcQyJ-gxke0' qui è <spiegato bene cosa vuol
+// dire). In breve, JavaScript, invece che aspettare che il metodo finisca la sua esecuzione,
+// continua ad eseguire il resto del file e noi volendo possiamo aggiungere una funzione di
+// callback per dirgli cosa fare una volta che il metodo ha concluso la sua esecuzione.
 mongoose.connect(dbURI)
 // Con il metodo 'then()' possiamo specificare la funzione di callback da dare ad una funzione
 // asincrona. In questo caso faccio in modo che il server inizi ad ascoltare le richieste solo dopo
@@ -63,6 +64,37 @@ const controller = {
     .catch((err) => {
       console.log(err);
     });
+  },
+    // Metodo che gestisce una richiesta di tipo 'POST' alla route '/post'.
+  postArticle: (req, res) => {
+    // Prendo i dati inviati dal form: il file se c'è e poi i campi testuali. Siccome stiamo
+    // salvando l'immagine in RAM invece che su disco è importante sottolineare che ci verrà
+    // passata un buffer rappresentante l'immagine.
+    let file = req.file;
+    let data = req.body;
+    
+    // Genero il percorso dove salvare l'immagine (da rivedere)
+    let path = "./uploads/" + Date.now() + ".webp";
+    // Utilizzo 'sharp', un modulo che mi permette di manipolare le immagini, per:
+    // 1. Prendere il buffer;
+    // 2. Convertirlo in 'webp', se necessario;
+    // 3. Far diventare il buffer un file e salvarlo su disco nel percorso specificato.
+    if(file.mimetype !== "image/webp")
+      sharp(file.buffer).webp().toFile(path);
+    else
+      sharp(file.buffer).toFile(path);
+
+    // Creo un articolo secondo lo Schema creato
+    let article = new Article({
+      title: data.title,
+      content: data.content,
+      thumbnail: path
+    });
+
+    // Salvo l'articolo all'interno del database
+    article.save()
+    // Invio come risposta l'id dell'articolo in caso di successo
+    .then(() => res.send(article["_id"]))
   }
 };
 

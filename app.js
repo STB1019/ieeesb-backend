@@ -8,9 +8,9 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8081;
 
-const articlesRoute = require("./src/routes/articlesRoutes");
+const articlesRoute = require("./src/routes/articlesRoutes")
 
-app.listen(PORT, console.log(`Server started on port ${PORT}...`)) // TO REMOVE
+app.listen(PORT, console.log(`Server started on port ${PORT}...`));
 
 // Utilizziamo il metodo 'use()' per creare un "middleware", codice che viene eseguito
 // indipendentemente dalla route che viene richiesta. In questo caso creiamo un
@@ -19,4 +19,4 @@ app.listen(PORT, console.log(`Server started on port ${PORT}...`)) // TO REMOVE
 // metodo che gestisce la specifica route a cui la richiesta è stata effettuata.
 // Il pezzo qui sopra lo tengo perché può tornare utile ma usando "multer" questo lo fai
 // lui in automatico.
-app.use(articlesRoute)
+app.use(articlesRoute);
