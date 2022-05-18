@@ -31,7 +31,7 @@ const articleSchema = new Schema(
 // Schema. Il nome non è a caso ma anzi molto importante, infatti 'MongoDB' in
 // automatico prende il nome del model, lo pluralizza e cerca quella collection
 // (non è case-sensitive), se non esiste la crea lui. In questo caso, per esempio,
-// cercherà la collection 'users'.
+// cercherà la collection 'articles'.
 const Article = mongoose.model("Article", articleSchema);
 
 // Infine esportiamo il model cosicché possiamo importarlo e usarlo in altri file.
