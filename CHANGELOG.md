@@ -1,3 +1,14 @@
+# [1.4.0](https://github.com/STB1019/ieeesb-backend/compare/v1.3.0...v1.4.0) (2022-05-18)
+
+
+### Features
+
+* 'PATCH' request works, as long as you only want to patch text, stil work in progress ([c6e50e0](https://github.com/STB1019/ieeesb-backend/commit/c6e50e0a27a502c380cc8c0e0a3af1df723899cc))
+* 'PATCH' working, now old images get canceled ([8c22bc7](https://github.com/STB1019/ieeesb-backend/commit/8c22bc7717b53ca316c8cc55bfb85b0957f6c738))
+* Created the PATCHarticle branch, feature still in progress ([25ae639](https://github.com/STB1019/ieeesb-backend/commit/25ae6395a5b4553770379e294b3223c59ddd0003))
+* Created the PATCHarticle branch, feature still in progress ([19e9f35](https://github.com/STB1019/ieeesb-backend/commit/19e9f354552243aaad642a9b947edd699e7576c6))
+* now also the thumbnail gets updated, still working on removing old thumbnails ([41d124a](https://github.com/STB1019/ieeesb-backend/commit/41d124a23fb4e685718da70cc38fe32966ca71ba))
+
 # [1.3.0](https://github.com/STB1019/ieeesb-backend/compare/v1.2.0...v1.3.0) (2022-05-18)
 
 
