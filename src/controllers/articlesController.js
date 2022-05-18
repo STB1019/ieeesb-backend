@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const dbURI = require("../../config.json").dbUri;
 const Article = require("../models/article");
 const sharp = require("sharp");
+const fs = require("fs");
 
 // Passandogli il link del database mi connetto ad esso. Infine il metodo 'connect()' è una
 // funzione asincrona ('https://www.youtube.com/watch?v=ZcQyJ-gxke0' qui è <spiegato bene cosa vuol
@@ -27,12 +28,16 @@ const controller = {
 
     let objectID = req.params.id;
 
+    Article.findById(objectID).then((result) => {
+      console.log(typeof(result.thumbnail));
+      fs.unlinkSync(result.thumbnail);  
+    });//.then((result) => result.thumbnail);
     // Genero il percorso dove salvare l'immagine (da rivedere)
     let path = "./uploads/" + Date.now() + ".webp";
     // Utilizzo 'sharp', un modulo che mi permette di manipolare le immagini, per:
     // 1. Prendere il buffer;
     // 2. Convertirlo in 'webp', se necessario;
-    // 3. Far diventare il buffer un file e salvarlo su disco nel percorso specificato.
+    // 3. Far diventare il buffer un file e salvar)lo su disco nel percorso specificato.
     if (file.mimetype !== "image/webp")
       sharp(file.buffer).webp().toFile(path);
     else
@@ -40,7 +45,7 @@ const controller = {
 
     let thumbnail = {thumbnail: path};
     Object.assign(data, thumbnail);
-    console.log(data);
+
     Article.findOneAndUpdate(
       { _id: objectID },
       data,
