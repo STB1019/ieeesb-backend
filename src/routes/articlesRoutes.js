@@ -1,19 +1,8 @@
-const {Router} = require("express");
+const { Router } = require("express");
 const articlesController = require("../controllers/articlesController");
+const multer = require("multer");
 
-const router = Router()
-
-router.get("/articles", articlesController.getArticles);
-router.get("/articles/:id", articlesController.getArticleById);
-
-module.exports = router;
-// Richiedo la funzione router dal modulo 'express' per gestire le varie route
-const {Router} = require("express");
-// Richiedo il controller degli articoli
-const articlesController = require("../controllers/articlesController");
-
-// Creo l'oggetto router vero e proprio che mi permette di gestire le route
-const router = Router()
+const router = Router();
 
 // Imposto dove salvare l'immagine e che nome dargli; poi creo l'oggetto per caricare i file e
 // anche il filtro per filtrare solo le immagini
