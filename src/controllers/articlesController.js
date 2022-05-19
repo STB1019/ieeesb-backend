@@ -64,7 +64,7 @@ const controller = {
     // findById ritorna l'articolo che corrisponde a quell'id
     Article.findById(id)
       .then((result) => {
-        res.send(result.json());
+        res.send(result);
       })
       .catch((err) => {
         console.log(err);
