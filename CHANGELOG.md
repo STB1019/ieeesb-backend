@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/STB1019/ieeesb-backend/compare/v1.6.0...v1.7.0) (2022-05-19)
+
+
+### Features
+
+* changed the schema of the articles and improved the doc ([581f64a](https://github.com/STB1019/ieeesb-backend/commit/581f64acfa8e2472c42cb56f9ab4455333053e09))
+
 # [1.6.0](https://github.com/STB1019/ieeesb-backend/compare/v1.5.0...v1.6.0) (2022-05-19)
 
 
