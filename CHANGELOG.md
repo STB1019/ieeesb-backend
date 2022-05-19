@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/STB1019/ieeesb-backend/compare/v1.5.0...v1.6.0) (2022-05-19)
+
+
+### Features
+
+* in theory, allow cross origin request ([09a602a](https://github.com/STB1019/ieeesb-backend/commit/09a602a6677d1cd5f5658734e72e73f45af669f6))
+
 # [1.5.0](https://github.com/STB1019/ieeesb-backend/compare/v1.4.0...v1.5.0) (2022-05-19)
 
 
