@@ -102,12 +102,11 @@ const controller = {
     // Invio come risposta l'id dell'articolo in caso di successo
     .then(() => res.send(article._id))
     .catch((err) => {
+      let errorMessage = err.message.substr(err.message.lastIndexOf(":")+2);
       if (err.name == 'ValidationError') {
-        console.error('Error Validating!', err);
-        res.status(422).json(err.message.substr(err.message.lastIndexOf(":")+2));
+        res.status(422).json(errorMessage);
       } else {
-        console.error(err);
-        res.status(500).json(err);
+        res.status(500).json(errorMessage);
       }
     });
   },
