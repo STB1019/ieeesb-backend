@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/STB1019/ieeesb-backend/compare/v1.4.0...v1.5.0) (2022-05-19)
+
+
+### Features
+
+* added error handling in 'POST' request ([09b137e](https://github.com/STB1019/ieeesb-backend/commit/09b137e6aabd5ff3336b7d52d9af9ab1689ad7d9))
+
 # [1.4.0](https://github.com/STB1019/ieeesb-backend/compare/v1.3.0...v1.4.0) (2022-05-18)
 
 
