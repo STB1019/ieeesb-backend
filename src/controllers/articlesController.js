@@ -10,12 +10,17 @@ const fs = require("fs");
 // continua ad eseguire il resto del file e noi volendo possiamo aggiungere una funzione di
 // callback per dirgli cosa fare una volta che il metodo ha concluso la sua esecuzione.
 mongoose.connect(dbURI)
-  // Con il metodo 'then()' possiamo specificare la funzione di callback da dare ad una funzione
-  // asincrona. In questo caso faccio in modo che il server inizi ad ascoltare le richieste solo dopo
-  // che la connessione con il DB è andata a buon fine. Mentre usiamo 'catch()' per "prendere"
-  // eventuali errori.
-  .then((result) => console.log("All good!"))
-  .catch((error) => console.log(error));
+// Con il metodo 'then()' possiamo specificare la funzione di callback da dare ad una funzione
+// asincrona. In questo caso faccio in modo che il server inizi ad ascoltare le richieste solo dopo
+// che la connessione con il DB è andata a buon fine. Mentre usiamo 'catch()' per "prendere"
+// eventuali errori.
+.then(() => console.log("All good!"))
+.catch((error) => console.log(error));
+
+let validationErrors = {
+  REQUIRED: "required",
+  NOTVALID: "notvalid"
+}
 
 const controller = {
   // Metodo che gestisce una richiesta di tipo 'DELETE' alla route '/articles'.
@@ -25,10 +30,10 @@ const controller = {
 
     // Elimino l'articolo dal database cercandolo per il suo id
     Article.findByIdAndDelete(id)
-      // Invio come risposta una stringa "OK!"
-      .then((result) => res.send("OK!"))
-      // Stampo il risultato in console in caso di errore (da rivedere)
-      .catch((error) => console.log(error));
+    // Invio come risposta una stringa "OK!"
+    .then(() => res.send("DELETE request executed!"))
+    // Stampo il risultato in console in caso di errore (da rivedere)
+    .catch((error) => console.log(error));
   },
   getArticles: (req, res) => {
     let data = req.query;
@@ -38,7 +43,6 @@ const controller = {
 
     let skip = (page - 1) * step;
 
-    console.log(skip, step);
     // Il metodo find ritorna una lista con tutti gli articoli presenti nel DB
     // è possibile utilizzare 'skip' e 'limit' per la paginazione. 'skip' indica quanti 
     // elementi del database saltare mentre 'limit' indica quanti elementi possono
@@ -46,12 +50,12 @@ const controller = {
     /* Non capisco perché così non funziona, ma se metto i "magic number" al posto delle variabili
     funziona :( */
     Article.find().skip(skip).limit(step)
-      .then((result) => {
-        res.send(result);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
   },
   getArticleById: (req, res) => {
     // Grazie a questo posso prendere i route parameters di questa route
@@ -89,13 +93,23 @@ const controller = {
     let article = new Article({
       title: data.title,
       content: data.content,
+      projectName: data.projectName,
+      author: data.author,
       thumbnail: path
     });
-
     // Salvo l'articolo all'interno del database
     article.save()
-      // Invio come risposta l'id dell'articolo in caso di successo
-      .then(() => res.send(article["_id"]))
+    // Invio come risposta l'id dell'articolo in caso di successo
+    .then(() => res.send(article._id))
+    .catch((err) => {
+      if (err.name == 'ValidationError') {
+        console.error('Error Validating!', err);
+        res.status(422).json(err.message.substr(err.message.lastIndexOf(":")+2));
+      } else {
+        console.error(err);
+        res.status(500).json(err);
+      }
+    });
   },
   // Metodo che gestisce una richiesta di tipo 'PATCH' alla route '/articles/:id'.
   patchArticle: (req, res) => {
@@ -104,13 +118,15 @@ const controller = {
     // passata un buffer rappresentante l'immagine.
     let file = req.file;
     let data = req.body;
-
     let objectID = req.params.id;
+    let getAndDeleteArticle = () => {
+      Article.findById(objectID)
+      .then((result) => {
+        let path = result.thumbnail;
+        fs.unlinkSync(path);  
+      });
+    };
 
-    Article.findById(objectID).then((result) => {
-      console.log(typeof(result.thumbnail));
-      fs.unlinkSync(result.thumbnail);  
-    });//.then((result) => result.thumbnail);
     // Genero il percorso dove salvare l'immagine (da rivedere)
     let path = "./uploads/" + Date.now() + ".webp";
     // Utilizzo 'sharp', un modulo che mi permette di manipolare le immagini, per:
@@ -130,9 +146,12 @@ const controller = {
       data,
       { new: true }
     )
-      .then(() => res.send("OK!"))
-      // Stampo il risultato in console in caso di errore (da rivedere)
-      .catch((error) => console.log(error));;
+    .then(() => {
+      getAndDeleteArticle();
+      res.send("PATCH request executed!");
+    })
+    // Stampo il risultato in console in caso di errore (da rivedere)
+    .catch((error) => console.log(error));;
   }
 };
 

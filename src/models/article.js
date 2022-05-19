@@ -12,23 +12,23 @@ const articleSchema = new Schema(
   {
     title: {
       type: String,
-      required: true,
+      required: [true, "Il titole dell'articolo è obbligatorio!"]
     },
     projectName: {
       type: String,
-      required: true,
+      required: [true, "Il nome del progetto è obbligatorio!"]
     },
     author: {
       type: String,
-      required: true,
+      required: [true, "L'auotre dell'articolo è obbligatorio!"]
     },
     content: {
       type: String,
-      required: true,
+      required: [true, "Il contenuto dell'articolo è obbligatorio!"]
     },
     thumbnail: {
       type: String,
-      required: false,
+      required: [true, "La thumbnail dell'articolo è obbligatorio!"]
     }
   },
   { timestamps: true }
