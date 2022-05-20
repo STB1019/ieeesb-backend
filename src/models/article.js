@@ -38,6 +38,10 @@ const articleSchema = new Schema(
   { timestamps: true }
 );
 
+articleSchema.on("save", (doc, next) => {
+  console.log(doc, next);
+});
+
 // Il metodo model, come si può intuire, crea il model vero e proprio, basta dargli
 // il nome della collection dove verranno salvati gli oggetti di questo tipo e uno
 // Schema. Il nome non è a caso ma anzi molto importante, infatti 'MongoDB' in

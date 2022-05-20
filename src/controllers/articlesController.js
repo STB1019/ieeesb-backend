@@ -17,6 +17,12 @@ mongoose.connect(dbURI)
 .then(() => console.log("DB connected!"))
 .catch((error) => console.log(error));
 
+let errorMessages = {
+  NOTFOUND: "The researched article wasn't found.",
+  CAST: "The id of the requested article is in the wrong format.",
+  DEFAULT: "Something went wrong!\nPlease try again later."
+}
+
 const controller = {
   // Metodo che gestisce una richiesta di tipo 'DELETE' alla route '/articles'.
   deleteArticle: (req, res) => {
@@ -26,15 +32,15 @@ const controller = {
     // Elimino l'articolo dal database cercandolo per il suo id
     Article.findByIdAndDelete(id)
     // Invio come risposta una stringa "OK!"
-    .then(() => res.send("pDELETE request executed!"))
+    .then(() => res.send("DELETE request executed!"))
     // Stampo il risultato in console in caso di errore (da rivedere)
     .catch((error) => console.log(error));
   },
   getArticles: (req, res) => {
     let data = req.query;
 
-    let page = parseInt(data["page"], 10);
-    let step = parseInt(data["step"], 10);
+    let page = parseInt(data.page, 10);
+    let step = parseInt(data.step, 10);
 
     let skip = (page - 1) * step;
 
@@ -52,14 +58,53 @@ const controller = {
       console.log(err);
     });
   },
+  /**
+  * Metodo che gestisce una richiesta di tipo "GET" al percorso "/articles/:id".
+  *
+  * @param {*} req Rappresenta la richiesta fatta al server.
+  * @param {*} res Rappresenta la risposta del server.
+  */
   getArticleById: (req, res) => {
-    // Grazie a questo posso prendere i route parameters di questa route
+    /**
+    * Per prima cosa prendo il "route parameters" dal percorso a cui è stata fatta la richiesta,
+    * quel ":id" serve solo a dare il nome al parametro che assumerà il valore inserito nel
+    * percorso.
+    */
     let id = req.params.id;
 
-    // findById ritorna l'articolo che corrisponde a quell'id
+    /**
+     * Utilizzo il metodo "findById()" il quale, dato l'id di un articolo lo ricerca all'interno
+     * del database.
+     * Posso verificarsi 4 casi:
+     * 1. La ricerca va a buon fine e l'articolo viene trovato, verrà impostato lo status code
+     * "200 OK" (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200) e viene inviato
+     * l'articolo trovato come messaggio;
+     * 2. Non viene trovato l'articolo trovato ma la ricerca non da errori, significa che
+     * l'articolo cercato non è stato trovato o non esiste, vine impostato lo status code
+     * "404 Not Found" (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404) e viene
+     * inviato un messaggio d'errore come json;
+     * 3. Il metodo genera un errore, nello specifico se si tratta di un "CastError", significa che
+     * la richiesta è stata posto in maniera errata e quindi viene impostato lo status code
+     * "400 Bad Request" (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400) e viene
+     * inviato un messaggio d'errore come json;
+     * 4. In caso non si tratti di un "CastError" ma di un altro errore viene impostato lo status
+     * code "500 Internal Server Error"
+     * (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) e viene inviato un messaggio
+     * d'errore generico come json.
+     */
     Article.findById(id)
-      .then((result) => res.send(result))
-      .catch((err) => console.log(err));
+      .then((result) => {
+        if(result)
+          res.status(200).json(result);
+        else
+          res.status(404).json(errorMessages.NOTFOUND);
+      })
+      .catch((error) => {
+        if(error.name == "CastError")
+          res.status(400).json(errorMessages.CAST);
+        else
+          res.status(500).json(errorMessages.DEFAULT);
+      });
   },
   /**
    * Metodo che gestisce una richiesta di tipo "POST" al percorso "/articles".
@@ -107,7 +152,7 @@ const controller = {
      * un messaggio d'errore.
      */
     article.save()
-    .then(() => res.send(article._id))
+    .then(() => res.status(201).json(article._id))
     .catch((error) => {
       /**
        * Per prima cosa prendo il messaggio d'errore che ho specificato nello schema, tuttavia
