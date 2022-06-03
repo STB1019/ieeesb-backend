@@ -5,7 +5,9 @@ const multer = require("multer");
 const router = Router();
 
 // Salva l'immagine nella RAM invece che su disco
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage()
+});
 
 // Associo ad una richiesta di tipo 'DELETE' sulla route '/articles/:id' alla funzione
 // 'deleteArticle' del controller

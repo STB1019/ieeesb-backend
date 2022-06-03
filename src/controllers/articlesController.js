@@ -1,51 +1,91 @@
-const mongoose = require("mongoose");
-const dbURI = require("../../config.json").dbUri;
-const Article = require("../models/article");
-const sharp = require("sharp");
-const fs = require("fs");
+const mongoose = require("mongoose"); // Modulo per dialogare con MongoDB
+const dbURI = require("../../config.json").dbUri; // Stringa di connessione al DB
+const Article = require("../models/article"); // Modello di un articolo
+const sharp = require("sharp"); // Modulo di manipolazione immagini
+const fs = require("fs"); // Modulo per utilizzare il File System
 
-// Passandogli il link del database mi connetto ad esso. Infine il metodo 'connect()' è una
-// funzione asincrona ('https://www.youtube.com/watch?v=ZcQyJ-gxke0' qui è <spiegato bene cosa vuol
-// dire). In breve, JavaScript, invece che aspettare che il metodo finisca la sua esecuzione,
-// continua ad eseguire il resto del file e noi volendo possiamo aggiungere una funzione di
-// callback per dirgli cosa fare una volta che il metodo ha concluso la sua esecuzione.
+/*
+ * Passando "dbURI" al metodo "connect()" mi permette di connettermi al DB salvato su MongoDB Atlas.
+ * È giusto precisare che il metodo "connect()" è asincrono
+ * ("https://www.youtube.com/watch?v=ZcQyJ-gxke0" qui è spiegato bene). In parole povere JavaScript
+ * non aspetta che il metodo finisca la sua esecuzione ma continua a leggere il resto del file
+ * anche se il metodo non ha finito di eseguire il suo codice.
+ * Successivamente utilizziamo il metodo "then()", in caso la connessione sia andata a buon fine,
+ * per stampare un messaggio di avvenuta connessione in console; oppure il metodo "catch()", in
+ * caso la connessione non sia avvenuta, per stampare l'errore in console.
+ */
 mongoose.connect(dbURI)
-  // Con il metodo 'then()' possiamo specificare la funzione di callback da dare ad una funzione
-  // asincrona. In questo caso faccio in modo che il server inizi ad ascoltare le richieste solo dopo
-  // che la connessione con il DB è andata a buon fine. Mentre usiamo 'catch()' per "prendere"
-  // eventuali errori.
   .then(() => console.log("DB connected!"))
   .catch((error) => console.log(error));
 
+/**
+ * Array associativo che tiene traccia dei messaggi di successo delle varie operazioni
+ */
 let confirmationMessages = {
   DELETE: "DELETE request successful"
 };
 
+/**
+ * Array associativo che tiene traccia dei messaggi d'errore delle varie operazioni.
+ */
 let errorMessages = {
-  NOTFOUND: "The researched article wasn't found.",
+  NOT_FOUND: "The researched article wasn't found.",
   CAST: "The id of the requested article is in the wrong format.",
-  NEGATIVE: "Page number cannot be negative!",
+  NEGATIVE_PAGE: "Page number must be greater than zero!",
+  NEGATIVE_STEP: "Step must be greater or equal than zero!",
+  IMAGE_FORMAT: "The file sent is is not supported!",
+  EMPTY_PATCH: "Can't patch if nothing is sent!",
   DEFAULT: "Something went wrong!\nPlease try again later."
 };
 
+let saveThumbnail = (data, file) => {
+  let thumbnailPath = "./uploads/" + Date.now() + ".webp";
+  let allowedExts = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+
+  if (allowedExts.includes(file.mimetype)) {
+    /**
+     * Essendo che l'immagine è stata salvata nella RAM da "multer", quello che avremmo è un buffer
+     * (uno dei motivi dell'utilizzo "sharp" è proprio perché permette di utilizzare i buffer) e,
+     * dopo aver verificato che il file non sia già nel formato "webp", semplicemente facciamo:
+     * 1. "sharp(file.buffer)" inizializza "sharp" partendo dal buffer;
+     * 2. ".webp()" converte il buffer nel formato "webp";
+     * 3. ".toFile(thumbnailPath)" salva il buffer su disco fisso nel percorso specificato.
+     */
+    if (mimetype != "image/webp")
+      sharp(file.buffer).webp().toFile(thumbnailPath);
+    else
+      sharp(file.buffer).toFile(thumbnailPath);
+
+    /**
+     * Aggiungo all'oggetto "data", contenente i campi testuali, il campo
+     * "thumbnail" avente come valore il percorso di dove è stata salvata la thumbnail.
+     */
+    Object.assign(data, { thumbnail: thumbnailPath });
+  }
+};
+
+/**
+ * Array associativo con all'interno diverse funzioni da associare alle varie routes.
+ */
 const controller = {
   /**
-  * Metodo che gestisce una richiesta di tipo "DELETE" al percorso "/articles/:id".
-  *
-  * @param {*} req Rappresenta la richiesta fatta al server.
-  * @param {*} res Rappresenta la risposta del server.
-  */
+   * Metodo che gestisce una richiesta di tipo "DELETE" al percorso "/articles/:id".
+   *
+   * @param {*} req Rappresenta la richiesta fatta al server.
+   * @param {*} res Rappresenta la risposta del server.
+   */
   deleteArticle: (req, res) => {
     /**
-    * Per prima cosa prendo il "route parameters" dal percorso a cui è stata fatta la richiesta,
-    * quel ":id" serve solo a dare il nome al parametro che assumerà il valore inserito nel
-    * percorso.
-    */
+     * Per prima cosa prendo il "route parameters" dal percorso a cui è stata fatta la richiesta,
+     * quel ":id" serve solo a dare il nome al parametro che assumerà il valore inserito nel
+     * percorso.
+     */
     let id = req.params.id;
 
     /**
      * Utilizzo il metodo "findById()" il quale, dato l'id di un articolo lo ricerca all'interno
-     * del database.
+     * del database. In questo caso aggiungo anche l'opzione "{ thumbnail: true }" in modo da
+     * ricevere solo id e thumbnail, che sono gli unici due parametri di cui ho bisogno.
      * Posso verificarsi 4 casi:
      * 1. La ricerca va a buon fine e l'articolo viene trovato, viene eliminata l'immagine salvata
      * e poi viene eseguito un 'findByIdAndDelete()' che cancella l'articolo dal database e poi,
@@ -66,19 +106,19 @@ const controller = {
      * (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) e viene inviato un messaggio
      * d'errore generico come json.
      */
-    Article.findById(id)
+    Article.findById(id, { thumbnail: true })
       .then((result) => {
         if (result) {
           fs.unlinkSync(result.thumbnail);
 
-          Article.findByIdAndDelete(id, (error) => {
+          Article.findByIdAndDelete(result.id, (error) => {
             if (error)
               console.error(error);
             else
               res.status(200).json(confirmationMessages.DELETE);
           })
         } else
-          res.status(404).json(errorMessages.NOTFOUND);
+          res.status(404).json(errorMessages.NOT_FOUND);
       })
       .catch((error) => {
         if (error.name == "CastError")
@@ -87,39 +127,71 @@ const controller = {
           res.status(500).json(errorMessages.DEFAULT);
       });
   },
+  /**
+   * Metodo che gestisce una richiesta di tipo "GET" al percorso "/articles".
+   *
+   * @param {*} req Rappresenta la richiesta fatta al server.
+   * @param {*} res Rappresenta la risposta del server.
+   */
   getArticles: (req, res) => {
+    /**
+     * Per prima cosa prendo i "query parameters" che erano nella richiesta, infatti la richiesta
+     * sarà fatta nel formato "/articles?page=1&step=4". I numeri qui sono solo placeholder, page
+     * indica a che pagina siamo mentre step indica quanti articoli per pagina si vuole visualizzare.
+     * In caso la richiesta venga fatta senza i parametri "page" e "step" verranno ritornati tutti
+     * gli articoli presenti nel database.
+     */
     let data = req.query;
-
     let page = parseInt(data.page, 10);
     let step = parseInt(data.step, 10);
+
+    /**
+     * Verifico che sia page che step siano nel formato corretto, in caso contrario invio uno
+     * specifico errore utilizzando lo status code "400 Bad Request"
+     * (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400). Poi calcolo quanti articoli
+     * sarà necessario saltare, partendo dalla pagina 0 e moltiplicando per quanti articoli voglio
+     * per pagina.
+     */
+    if (page <= 0) {
+      res.status(400).json(errorMessages.NEGATIVE_PAGE);
+      return;
+    }
+
+    if (step < 0) {
+      res.status(400).json(errorMessages.NEGATIVE_STEP);
+      return;
+    } else if (step == 0) {
+      res.status(200).json([]);
+      return;
+    }
+
     let skip = (page - 1) * step;
 
-    // Il metodo find ritorna una lista con tutti gli articoli presenti nel DB
-    // è possibile utilizzare 'skip' e 'limit' per la paginazione. 'skip' indica quanti 
-    // elementi del database saltare mentre 'limit' indica quanti elementi possono
-    // stare in una singola pagina.
-    /* Non capisco perché così non funziona, ma se metto i "magic number" al posto delle variabili
-    funziona :( */
+    /**
+     * Utilizzo il metodo "find()" per prendere tutti gli articoli del database aggiungendo i metodi
+     * "skip()" e "limit()": il primo dice quanti documenti saltare partendo dal primo, il secondo
+     * dice quanti prenderne. In caso di successo verrà impostato lo status code "200 OK"
+     * (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200) e saranno inviati gli articoli
+     * sotto forma di json. In caso di errore viene impostato lo status code
+     * "500 Internal Server Error" (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) e
+     * viene inviato un messaggio d'errore generico come json.
+     */
     Article.find().skip(skip).limit(step)
-      .then((result) => {
-        res.send(result);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      .then((result) => res.status(200).json(result))
+      .catch(() => res.status(500).json(errorMessages.DEFAULT));
   },
   /**
-  * Metodo che gestisce una richiesta di tipo "GET" al percorso "/articles/:id".
-  *
-  * @param {*} req Rappresenta la richiesta fatta al server.
-  * @param {*} res Rappresenta la risposta del server.
-  */
+   * Metodo che gestisce una richiesta di tipo "GET" al percorso "/articles/:id".
+   *
+   * @param {*} req Rappresenta la richiesta fatta al server.
+   * @param {*} res Rappresenta la risposta del server.
+   */
   getArticleById: (req, res) => {
     /**
-    * Per prima cosa prendo il "route parameters" dal percorso a cui è stata fatta la richiesta,
-    * quel ":id" serve solo a dare il nome al parametro che assumerà il valore inserito nel
-    * percorso.
-    */
+     * Per prima cosa prendo il "route parameters" dal percorso a cui è stata fatta la richiesta,
+     * quel ":id" serve solo a dare il nome al parametro che assumerà il valore inserito nel
+     * percorso.
+     */
     let id = req.params.id;
 
     /**
@@ -147,7 +219,7 @@ const controller = {
         if (result)
           res.status(200).json(result);
         else
-          res.status(404).json(errorMessages.NOTFOUND);
+          res.status(404).json(errorMessages.NOT_FOUND);
       })
       .catch((error) => {
         if (error.name == "CastError")
@@ -164,36 +236,32 @@ const controller = {
    */
   postArticle: (req, res) => {
     /**
-     * Prendo i dati inviati dal form:
-     * 1. "req.file" conterrà qualsiasi file intercettato da "multer", modulo utile per il passaggio
-     *    e salvataggio di immagini attraverso i form;
-     * 2. "req.body" conterrà tutti i campi testuali.
+     * Salvo qualsiasi file e testo venga inviato a questa route tramite "POST" request.
+     * Creo il percorso dove salvare la "thumbnail".
+     * Creo l'articolo che dovrò "postare" e infine creo un array contenente tutti i tipi di
+     * immagine accettabili.
      */
     let file = req.file;
     let data = req.body;
-    let thumbnailPath = "./uploads/" + Date.now() + ".webp";
     let article;
 
     /**
-     * Per gestire le immagini utilizzo "sharp", un modulo che permette di manipolare le immagini.
-     * Essendo che l'immagine è stata salvata nella RAM da "multer", quello che avremmo è un buffer
-     * (uno dei motivi dell'utilizzo "sharp" è proprio perché permette di utilizzare i buffer) e,
-     * dopo aver verificato che il file non sia già nel formato "webp", semplicemente facciamo:
-     * 1. "sharp(file.buffer)" inizializza "sharp" partendo dal buffer;
-     * 2. ".webp()" converte il buffer nel formato "webp";
-     * 3. ".toFile(thumbnailPath)" salva il buffer su disco fisso nel percorso specificato.
+     * Prima di procedere con il salvataggio dell'immagine verifico che sia stata inviata.
      */
-    if (file.mimetype !== "image/webp")
-      sharp(file.buffer).webp().toFile(thumbnailPath);
-    else
-      sharp(file.buffer).toFile(thumbnailPath);
+    if (typeof file != "undefined" && file != null) {
+      /**
+       * Una volta saputo che l'immagine è stata inviata procedo a verificare che sia in una delle
+       * estensioni consentite prima di salvarla su disco.
+       */
+      saveThumbnail(data, file);
+    } else {
+      res.status(400).json(errorMessages.IMAGE_FORMAT);
+      return;
+    }
 
     /**
-     * Per prima cosa aggiungo all'oggetto "data", contenente i campi testuali, il campo
-     * "thumbnail" avente come valore il percorso di dove è stata salvata la thumbnail e poi
-     * procedo con il creare l'article secondo lo schema specificato.
+     * Creo l'articolo con i dati che mi sono stati inviati.
      */
-    Object.assign(data, { thumbnail: thumbnailPath });
     article = new Article(data);
 
     /**
@@ -226,47 +294,89 @@ const controller = {
         }
       });
   },
-  // Metodo che gestisce una richiesta di tipo 'PATCH' alla route '/articles/:id'.
+  /**
+   * Metodo che gestisce una richiesta di tipo "PATCH" al percorso "/articles/:id".
+   * 
+   * @param {*} req Rappresenta la richiesta fatta al server.
+   * @param {*} res Rappresenta la risposta del server.
+   */
   patchArticle: (req, res) => {
-    // Prendo i dati inviati dal form: il file se c'è e poi i campi testuali. Siccome stiamo
-    // salvando l'immagine in RAM invece che su disco è importante sottolineare che ci verrà
-    // passata un buffer rappresentante l'immagine.
+    /**
+     * Salvo qualsiasi file e testo venga inviato a questa route tramite "PATCH" request.
+     * Creo un booleano che mi tiene traccia se è stato inviato un file o meno.
+     */
     let file = req.file;
     let data = req.body;
-    let objectID = req.params.id;
-    let getAndDeleteArticle = () => {
-      Article.findById(objectID)
+    let doesThumbnailExists = true;
+
+    /**
+     * Verifico che almeno i campi di testo siano stati inviati altrimenti imposto lo status code
+     * "400 Bad Request" (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400) e invio un
+     * messaggio d'errore in formato json.
+     */
+    if (typeof file === "undefined" || file === null) {
+      doesThumbnailExists = false;
+
+      if (typeof data === "undefined" || data === null) {
+        res.status(400).json(errorMessages.EMPTY_PATCH);
+        return;
+      }
+    }
+
+    /**
+     * Prendo l'id dell'articolo e poi creo una funziona che cerca ed elimina la vecchia thumbnail
+     * dell'articolo.
+     */
+    let id = req.params.id;
+    let getAndDeleteThumbnail = () => {
+      Article.findById(id, { thumbnail: true })
         .then((result) => {
-          let path = result.thumbnail;
-          fs.unlinkSync(path);
+          fs.unlinkSync(result.thumbnail);
+        })
+        .catch((error) => {
+          if (error.name === "CastError")
+            res.status(400).json(errorMessages.CAST);
+          else
+            res.status(500).json(errorMessages.DEFAULT);
         });
     };
 
-    // Genero il percorso dove salvare l'immagine (da rivedere)
-    let path = "./uploads/" + Date.now() + ".webp";
-    // Utilizzo "sharp", un modulo che mi permette di manipolare le immagini, per:
-    // 1. Prendere il buffer;
-    // 2. Convertirlo in 'webp', se necessario;
-    // 3. Far diventare il buffer un file e salvar)lo su disco nel percorso specificato.
-    if (file.mimetype !== "image/webp")
-      sharp(file.buffer).webp().toFile(path);
-    else
-      sharp(file.buffer).toFile(path);
+    /**
+     * In caso una nuova thumbnail mi è stata inviata la salvo su disco.
+     */
+    if (doesThumbnailExists) {
+      saveThumbnail(data, file);
+    }
 
-    let thumbnail = { thumbnail: path };
-    Object.assign(data, thumbnail);
+    /**
+     * Cerco l'articolo tramite l'id e sostituisco i parametri presenti in "data".
+     * Ci possono essere 3 casi:
+     * 1. L'esecuzione del metodo va a buon fine, cancello la vecchia thumbnail in caso sia stata
+     * aggiornata e poi imposto lo status code a "200 OK"
+     * (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200) inviando l'articolo
+     * modificato in formato json come risposta;
+     * 2. Il metodo genera un errore, nello specifico se si tratta di un "CastError", significa che
+     * la richiesta è stata posto in maniera errata e quindi viene impostato lo status code
+     * "400 Bad Request" (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400) e viene
+     * inviato un messaggio d'errore come json;
+     * 3. In caso non si tratti di un "CastError" ma di un altro errore viene impostato lo status
+     * code "500 Internal Server Error"
+     * (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) e viene inviato un messaggio
+     * d'errore generico come json.
+     */
+    Article.findOneAndUpdate({ _id: id }, data)
+      .then((patchedArticle) => {
+        if (doesThumbnailExists)
+          getAndDeleteThumbnail();
 
-    Article.findOneAndUpdate(
-      { _id: objectID },
-      data,
-      { new: true }
-    )
-      .then(() => {
-        getAndDeleteArticle();
-        res.send("PATCH request executed!");
+        res.status(200).json(patchedArticle);
       })
-      // Stampo il risultato in console in caso di errore (da rivedere)
-      .catch((error) => console.log(error));;
+      .catch((error) => {
+        if (error.name == "CastError")
+          res.status(400).json(errorMessages.CAST);
+        else
+          res.status(500).json(errorMessages.DEFAULT);
+      });
   }
 };
 
