@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/STB1019/ieeesb-backend/compare/v1.7.0...v1.8.0) (2022-06-03)
+
+
+### Features
+
+* error handling completed, updated the code structure a bit and added doc ([90f812c](https://github.com/STB1019/ieeesb-backend/commit/90f812cd8283261585c3fcd52734dbe132e1e6e5))
+
 # [1.7.0](https://github.com/STB1019/ieeesb-backend/compare/v1.6.0...v1.7.0) (2022-05-19)
 
 
