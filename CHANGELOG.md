@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/STB1019/ieeesb-backend/compare/v1.8.0...v1.9.0) (2022-07-12)
+
+
+### Features
+
+* added the handling of project objects, testing is still needed ([a7ac78c](https://github.com/STB1019/ieeesb-backend/commit/a7ac78cd92fba8d64b4159d0ed2600f85063acfc))
+
 # [1.8.0](https://github.com/STB1019/ieeesb-backend/compare/v1.7.0...v1.8.0) (2022-06-03)
 
 
