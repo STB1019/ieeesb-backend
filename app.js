@@ -5,7 +5,8 @@
 // di default di 'NodeJS' quindi non vedo perché non usarli.
 const express = require("express");
 //const cors = require("cors");
-const articlesRoute = require("./src/routes/articlesRoutes");
+const projectsRoutes = require("./src/routes/projectsRoutes");
+const articlesRoutes = require("./src/routes/articlesRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -20,5 +21,8 @@ app.listen(PORT, console.log(`Server started on port ${PORT}...`));
 // Il pezzo qui sopra lo tengo perché può tornare utile ma usando "multer" questo lo fai
 // lui in automatico.
 //app.use(cors());
+app.use(express.static(__dirname + "/uploads"));
 app.use(express.urlencoded({ extended: true }));
-app.use(articlesRoute)
+
+app.use(projectsRoutes);
+app.use(articlesRoutes);

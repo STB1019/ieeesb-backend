@@ -21,14 +21,14 @@ mongoose.connect(dbURI)
 /**
  * Array associativo che tiene traccia dei messaggi di successo delle varie operazioni
  */
-let confirmationMessages = {
+const confirmationMessages = {
   DELETE: "DELETE request successful"
 };
 
 /**
  * Array associativo che tiene traccia dei messaggi d'errore delle varie operazioni.
  */
-let errorMessages = {
+const errorMessages = {
   NOT_FOUND: "The researched article wasn't found.",
   CAST: "The id of the requested article is in the wrong format.",
   NEGATIVE_PAGE: "Page number must be greater than zero!",
@@ -38,8 +38,9 @@ let errorMessages = {
   DEFAULT: "Something went wrong!\nPlease try again later."
 };
 
-let saveThumbnail = (data, file) => {
-  let thumbnailPath = "./uploads/" + Date.now() + ".webp";
+const thumbnailPath = __dirname + "/../../uploads/";
+const saveThumbnail = (data, file) => {
+  let thumbnailName = Date.now() + ".webp";
   let allowedExts = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 
   if (allowedExts.includes(file.mimetype)) {
@@ -51,16 +52,16 @@ let saveThumbnail = (data, file) => {
      * 2. ".webp()" converte il buffer nel formato "webp";
      * 3. ".toFile(thumbnailPath)" salva il buffer su disco fisso nel percorso specificato.
      */
-    if (mimetype != "image/webp")
-      sharp(file.buffer).webp().toFile(thumbnailPath);
+    if (file.mimetype != "image/webp")
+      sharp(file.buffer).webp().toFile(thumbnailPath + thumbnailName);
     else
-      sharp(file.buffer).toFile(thumbnailPath);
+      sharp(file.buffer).toFile(thumbnailPath + thumbnailName);
 
     /**
      * Aggiungo all'oggetto "data", contenente i campi testuali, il campo
      * "thumbnail" avente come valore il percorso di dove è stata salvata la thumbnail.
      */
-    Object.assign(data, { thumbnail: thumbnailPath });
+    Object.assign(data, { thumbnail: thumbnailName });
   }
 };
 
@@ -109,13 +110,14 @@ const controller = {
     Article.findById(id, { thumbnail: true })
       .then((result) => {
         if (result) {
-          fs.unlinkSync(result.thumbnail);
 
           Article.findByIdAndDelete(result.id, (error) => {
             if (error)
               console.error(error);
-            else
+            else {
               res.status(200).json(confirmationMessages.DELETE);
+              fs.unlinkSync(thumbnailPath + result.thumbnail);
+            }
           })
         } else
           res.status(404).json(errorMessages.NOT_FOUND);
