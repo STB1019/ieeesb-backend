@@ -1,20 +1,28 @@
-const { Router } = require("express");
-const projectsController = require("../controllers/projectsController");
-const multer = require("multer");
+const { Router } = require('express')
+const projectsController = require('../controllers/projectsController')
+const multer = require('multer')
 
-const router = Router();
+const router = Router()
 
 const upload = multer({
   storage: multer.memoryStorage()
-});
+})
 
-router.delete("/projects/:id", projectsController.deleteProject);
+router.delete('/projects/:id', projectsController.deleteProject)
 
-router.get("/projects", projectsController.getProjects);
-router.get("/projects/:id", projectsController.getProjectById);
+router.get('/projects', projectsController.getProjects)
+router.get('/projects/:id', projectsController.getProjectById)
 
-router.post("/projects", upload.single("thumbnail"), projectsController.postProject);
+router.post(
+  '/projects',
+  upload.single('thumbnail'),
+  projectsController.postProject
+)
 
-router.patch("/projects", upload.single("thumbnail"), projectsController.patchProject);
+router.patch(
+  '/projects',
+  upload.single('thumbnail'),
+  projectsController.patchProject
+)
 
-module.exports = router;
+module.exports = router

@@ -21,6 +21,7 @@ commenting and amending the proposed changes.
 - Use a "feature branch" for your changes. That separates the changes in the
   pull request from your other changes and makes it easy to edit/amend commits
   in the pull request. Workflow using "feature_x" as the example:
+
   - Update your local git fork to the tip (of the master, usually)
   - Create the feature branch with `git checkout -b feature_x`
   - Edit changes and commit them locally

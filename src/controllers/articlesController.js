@@ -1,8 +1,8 @@
-const mongoose = require("mongoose"); // Modulo per dialogare con MongoDB
-const dbURI = require("../../config.json").dbUri; // Stringa di connessione al DB
-const Article = require("../models/article"); // Modello di un articolo
-const sharp = require("sharp"); // Modulo di manipolazione immagini
-const fs = require("fs"); // Modulo per utilizzare il File System
+const mongoose = require('mongoose') // Modulo per dialogare con MongoDB
+const dbURI = require('../../config.json').dbUri // Stringa di connessione al DB
+const Article = require('../models/article') // Modello di un articolo
+const sharp = require('sharp') // Modulo di manipolazione immagini
+const fs = require('fs') // Modulo per utilizzare il File System
 
 /*
  * Passando "dbURI" al metodo "connect()" mi permette di connettermi al DB salvato su MongoDB Atlas.
@@ -14,34 +14,35 @@ const fs = require("fs"); // Modulo per utilizzare il File System
  * per stampare un messaggio di avvenuta connessione in console; oppure il metodo "catch()", in
  * caso la connessione non sia avvenuta, per stampare l'errore in console.
  */
-mongoose.connect(dbURI)
-  .then(() => console.log("DB connected!"))
-  .catch((error) => console.log(error));
+mongoose
+  .connect(dbURI)
+  .then(() => console.log('DB connected!'))
+  .catch(error => console.log(error))
 
 /**
  * Array associativo che tiene traccia dei messaggi di successo delle varie operazioni
  */
 const confirmationMessages = {
-  DELETE: "DELETE request successful"
-};
+  DELETE: 'DELETE request successful'
+}
 
 /**
  * Array associativo che tiene traccia dei messaggi d'errore delle varie operazioni.
  */
 const errorMessages = {
   NOT_FOUND: "The researched article wasn't found.",
-  CAST: "The id of the requested article is in the wrong format.",
-  NEGATIVE_PAGE: "Page number must be greater than zero!",
-  NEGATIVE_STEP: "Step must be greater or equal than zero!",
-  IMAGE_FORMAT: "The file sent is is not supported!",
+  CAST: 'The id of the requested article is in the wrong format.',
+  NEGATIVE_PAGE: 'Page number must be greater than zero!',
+  NEGATIVE_STEP: 'Step must be greater or equal than zero!',
+  IMAGE_FORMAT: 'The file sent is is not supported!',
   EMPTY_PATCH: "Can't patch if nothing is sent!",
-  DEFAULT: "Something went wrong!\nPlease try again later."
-};
+  DEFAULT: 'Something went wrong!\nPlease try again later.'
+}
 
-const thumbnailPath = __dirname + "/../../uploads/";
+const thumbnailPath = __dirname + '/../../uploads/'
 const saveThumbnail = (data, file) => {
-  let thumbnailName = Date.now() + ".webp";
-  let allowedExts = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+  let thumbnailName = Date.now() + '.webp'
+  let allowedExts = ['image/png', 'image/jpeg', 'image/webp', 'image/gif']
 
   if (allowedExts.includes(file.mimetype)) {
     /**
@@ -52,18 +53,19 @@ const saveThumbnail = (data, file) => {
      * 2. ".webp()" converte il buffer nel formato "webp";
      * 3. ".toFile(thumbnailPath)" salva il buffer su disco fisso nel percorso specificato.
      */
-    if (file.mimetype != "image/webp")
-      sharp(file.buffer).webp().toFile(thumbnailPath + thumbnailName);
-    else
-      sharp(file.buffer).toFile(thumbnailPath + thumbnailName);
+    if (file.mimetype != 'image/webp')
+      sharp(file.buffer)
+        .webp()
+        .toFile(thumbnailPath + thumbnailName)
+    else sharp(file.buffer).toFile(thumbnailPath + thumbnailName)
 
     /**
      * Aggiungo all'oggetto "data", contenente i campi testuali, il campo
      * "thumbnail" avente come valore il percorso di dove è stata salvata la thumbnail.
      */
-    Object.assign(data, { thumbnail: thumbnailName });
+    Object.assign(data, { thumbnail: thumbnailName })
   }
-};
+}
 
 /**
  * Array associativo con all'interno diverse funzioni da associare alle varie routes.
@@ -81,7 +83,7 @@ const controller = {
      * quel ":id" serve solo a dare il nome al parametro che assumerà il valore inserito nel
      * percorso.
      */
-    let id = req.params.id;
+    let id = req.params.id
 
     /**
      * Utilizzo il metodo "findById()" il quale, dato l'id di un articolo lo ricerca all'interno
@@ -108,26 +110,21 @@ const controller = {
      * d'errore generico come json.
      */
     Article.findById(id, { thumbnail: true })
-      .then((result) => {
+      .then(result => {
         if (result) {
-
-          Article.findByIdAndDelete(result.id, (error) => {
-            if (error)
-              console.error(error);
+          Article.findByIdAndDelete(result.id, error => {
+            if (error) console.error(error)
             else {
-              res.status(200).json(confirmationMessages.DELETE);
-              fs.unlinkSync(thumbnailPath + result.thumbnail);
+              res.status(200).json(confirmationMessages.DELETE)
+              fs.unlinkSync(thumbnailPath + result.thumbnail)
             }
           })
-        } else
-          res.status(404).json(errorMessages.NOT_FOUND);
+        } else res.status(404).json(errorMessages.NOT_FOUND)
       })
-      .catch((error) => {
-        if (error.name == "CastError")
-          res.status(400).json(errorMessages.CAST);
-        else
-          res.status(500).json(errorMessages.DEFAULT);
-      });
+      .catch(error => {
+        if (error.name == 'CastError') res.status(400).json(errorMessages.CAST)
+        else res.status(500).json(errorMessages.DEFAULT)
+      })
   },
   /**
    * Metodo che gestisce una richiesta di tipo "GET" al percorso "/articles".
@@ -143,9 +140,9 @@ const controller = {
      * In caso la richiesta venga fatta senza i parametri "page" e "step" verranno ritornati tutti
      * gli articoli presenti nel database.
      */
-    let data = req.query;
-    let page = parseInt(data.page, 10);
-    let step = parseInt(data.step, 10);
+    let data = req.query
+    let page = parseInt(data.page, 10)
+    let step = parseInt(data.step, 10)
 
     /**
      * Verifico che sia page che step siano nel formato corretto, in caso contrario invio uno
@@ -155,19 +152,19 @@ const controller = {
      * per pagina.
      */
     if (page <= 0) {
-      res.status(400).json(errorMessages.NEGATIVE_PAGE);
-      return;
+      res.status(400).json(errorMessages.NEGATIVE_PAGE)
+      return
     }
 
     if (step < 0) {
-      res.status(400).json(errorMessages.NEGATIVE_STEP);
-      return;
+      res.status(400).json(errorMessages.NEGATIVE_STEP)
+      return
     } else if (step == 0) {
-      res.status(200).json([]);
-      return;
+      res.status(200).json([])
+      return
     }
 
-    let skip = (page - 1) * step;
+    let skip = (page - 1) * step
 
     /**
      * Utilizzo il metodo "find()" per prendere tutti gli articoli del database aggiungendo i metodi
@@ -178,9 +175,11 @@ const controller = {
      * "500 Internal Server Error" (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) e
      * viene inviato un messaggio d'errore generico come json.
      */
-    Article.find().skip(skip).limit(step)
-      .then((result) => res.status(200).json(result))
-      .catch(() => res.status(500).json(errorMessages.DEFAULT));
+    Article.find()
+      .skip(skip)
+      .limit(step)
+      .then(result => res.status(200).json(result))
+      .catch(() => res.status(500).json(errorMessages.DEFAULT))
   },
   /**
    * Metodo che gestisce una richiesta di tipo "GET" al percorso "/articles/:id".
@@ -194,7 +193,7 @@ const controller = {
      * quel ":id" serve solo a dare il nome al parametro che assumerà il valore inserito nel
      * percorso.
      */
-    let id = req.params.id;
+    let id = req.params.id
 
     /**
      * Utilizzo il metodo "findById()" il quale, dato l'id di un articolo lo ricerca all'interno
@@ -217,22 +216,18 @@ const controller = {
      * d'errore generico come json.
      */
     Article.findById(id)
-      .then((result) => {
-        if (result)
-          res.status(200).json(result);
-        else
-          res.status(404).json(errorMessages.NOT_FOUND);
+      .then(result => {
+        if (result) res.status(200).json(result)
+        else res.status(404).json(errorMessages.NOT_FOUND)
       })
-      .catch((error) => {
-        if (error.name == "CastError")
-          res.status(400).json(errorMessages.CAST);
-        else
-          res.status(500).json(errorMessages.DEFAULT);
-      });
+      .catch(error => {
+        if (error.name == 'CastError') res.status(400).json(errorMessages.CAST)
+        else res.status(500).json(errorMessages.DEFAULT)
+      })
   },
   /**
    * Metodo che gestisce una richiesta di tipo "POST" al percorso "/articles".
-   * 
+   *
    * @param {*} req Rappresenta la richiesta fatta al server.
    * @param {*} res Rappresenta la risposta del server.
    */
@@ -243,44 +238,45 @@ const controller = {
      * Creo l'articolo che dovrò "postare" e infine creo un array contenente tutti i tipi di
      * immagine accettabili.
      */
-    let file = req.file;
-    let data = req.body;
-    let article;
+    let file = req.file
+    let data = req.body
+    let article
 
     /**
      * Prima di procedere con il salvataggio dell'immagine verifico che sia stata inviata.
      */
-    if (typeof file != "undefined" && file != null) {
+    if (typeof file != 'undefined' && file != null) {
       /**
        * Una volta saputo che l'immagine è stata inviata procedo a verificare che sia in una delle
        * estensioni consentite prima di salvarla su disco.
        */
-      saveThumbnail(data, file);
+      saveThumbnail(data, file)
     } else {
-      res.status(400).json(errorMessages.IMAGE_FORMAT);
-      return;
+      res.status(400).json(errorMessages.IMAGE_FORMAT)
+      return
     }
 
     /**
      * Creo l'articolo con i dati che mi sono stati inviati.
      */
-    article = new Article(data);
+    article = new Article(data)
 
     /**
      * Procedo con il salvataggio dell'articolo nel database.
      * In caso di successo, restituisco "l'id" dell'articolo appena creato, altrimenti restituisco
      * un messaggio d'errore.
      */
-    article.save()
+    article
+      .save()
       .then(() => res.status(201).json(article._id))
-      .catch((error) => {
+      .catch(error => {
         /**
          * Per prima cosa prendo il messaggio d'errore che ho specificato nello schema, tuttavia
          * "mongoose" aggiunge altro di non necessario all'interno del messaggio e di conseguenza
          * utilizziamo un "substr()" per avere solo il messaggio finale.
          */
-        let errorMessage = error.message;
-        let message = errorMessage.substr(errorMessage.lastIndexOf(":") + 2);
+        let errorMessage = error.message
+        let message = errorMessage.substr(errorMessage.lastIndexOf(':') + 2)
 
         /**
          * Qui verifichiamo se si tratta di un'errore di validazione, in caso affermativo ritorniamo
@@ -289,16 +285,16 @@ const controller = {
          * ritorniamo l'errore settando lo status code "500 Internal Server Error"
          * (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500).
          */
-        if (error.name == "ValidationError") {
-          res.status(422).json(message);
+        if (error.name == 'ValidationError') {
+          res.status(422).json(message)
         } else {
-          res.status(500).json(message);
+          res.status(500).json(message)
         }
-      });
+      })
   },
   /**
    * Metodo che gestisce una richiesta di tipo "PATCH" al percorso "/articles/:id".
-   * 
+   *
    * @param {*} req Rappresenta la richiesta fatta al server.
    * @param {*} res Rappresenta la risposta del server.
    */
@@ -307,21 +303,21 @@ const controller = {
      * Salvo qualsiasi file e testo venga inviato a questa route tramite "PATCH" request.
      * Creo un booleano che mi tiene traccia se è stato inviato un file o meno.
      */
-    let file = req.file;
-    let data = req.body;
-    let doesThumbnailExists = true;
+    let file = req.file
+    let data = req.body
+    let doesThumbnailExists = true
 
     /**
      * Verifico che almeno i campi di testo siano stati inviati altrimenti imposto lo status code
      * "400 Bad Request" (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400) e invio un
      * messaggio d'errore in formato json.
      */
-    if (typeof file === "undefined" || file === null) {
-      doesThumbnailExists = false;
+    if (typeof file === 'undefined' || file === null) {
+      doesThumbnailExists = false
 
-      if (typeof data === "undefined" || data === null) {
-        res.status(400).json(errorMessages.EMPTY_PATCH);
-        return;
+      if (typeof data === 'undefined' || data === null) {
+        res.status(400).json(errorMessages.EMPTY_PATCH)
+        return
       }
     }
 
@@ -329,25 +325,24 @@ const controller = {
      * Prendo l'id dell'articolo e poi creo una funziona che cerca ed elimina la vecchia thumbnail
      * dell'articolo.
      */
-    let id = req.params.id;
+    let id = req.params.id
     let getAndDeleteThumbnail = () => {
       Article.findById(id, { thumbnail: true })
-        .then((result) => {
-          fs.unlinkSync(result.thumbnail);
+        .then(result => {
+          fs.unlinkSync(result.thumbnail)
         })
-        .catch((error) => {
-          if (error.name === "CastError")
-            res.status(400).json(errorMessages.CAST);
-          else
-            res.status(500).json(errorMessages.DEFAULT);
-        });
-    };
+        .catch(error => {
+          if (error.name === 'CastError')
+            res.status(400).json(errorMessages.CAST)
+          else res.status(500).json(errorMessages.DEFAULT)
+        })
+    }
 
     /**
      * In caso una nuova thumbnail mi è stata inviata la salvo su disco.
      */
     if (doesThumbnailExists) {
-      saveThumbnail(data, file);
+      saveThumbnail(data, file)
     }
 
     /**
@@ -367,19 +362,16 @@ const controller = {
      * d'errore generico come json.
      */
     Article.findOneAndUpdate({ _id: id }, data)
-      .then((patchedArticle) => {
-        if (doesThumbnailExists)
-          getAndDeleteThumbnail();
+      .then(patchedArticle => {
+        if (doesThumbnailExists) getAndDeleteThumbnail()
 
-        res.status(200).json(patchedArticle);
+        res.status(200).json(patchedArticle)
       })
-      .catch((error) => {
-        if (error.name == "CastError")
-          res.status(400).json(errorMessages.CAST);
-        else
-          res.status(500).json(errorMessages.DEFAULT);
-      });
+      .catch(error => {
+        if (error.name == 'CastError') res.status(400).json(errorMessages.CAST)
+        else res.status(500).json(errorMessages.DEFAULT)
+      })
   }
-};
+}
 
-module.exports = controller;
+module.exports = controller

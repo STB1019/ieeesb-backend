@@ -3,15 +3,15 @@
 // potremmo utilizzare i pacchetti di default, non avremmo bisogno neanche
 // di 'mongoose', tuttavia entrambi ci semplificano la vita rispetto ai pacchetti
 // di default di 'NodeJS' quindi non vedo perché non usarli.
-const express = require("express");
+const express = require('express')
 //const cors = require("cors");
-const projectsRoutes = require("./src/routes/projectsRoutes");
-const articlesRoutes = require("./src/routes/articlesRoutes");
+const projectsRoutes = require('./src/routes/projectsRoutes')
+const articlesRoutes = require('./src/routes/articlesRoutes')
 
-const app = express();
-const PORT = process.env.PORT || 8081;
+const app = express()
+const PORT = process.env.PORT || 8081
 
-app.listen(PORT, console.log(`Server started on port ${PORT}...`));
+app.listen(PORT, console.log(`Server started on port ${PORT}...`))
 
 // Utilizziamo il metodo 'use()' per creare un "middleware", codice che viene eseguito
 // indipendentemente dalla route che viene richiesta. In questo caso creiamo un
@@ -21,8 +21,8 @@ app.listen(PORT, console.log(`Server started on port ${PORT}...`));
 // Il pezzo qui sopra lo tengo perché può tornare utile ma usando "multer" questo lo fai
 // lui in automatico.
 //app.use(cors());
-app.use(express.static(__dirname + "/uploads"));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.static(__dirname + '/uploads'))
+app.use(express.urlencoded({ extended: true }))
 
-app.use(projectsRoutes);
-app.use(articlesRoutes);
+app.use(projectsRoutes)
+app.use(articlesRoutes)
