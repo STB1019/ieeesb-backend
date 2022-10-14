@@ -23,20 +23,22 @@ mongoose
  * Array associativo che tiene traccia dei messaggi di successo delle varie operazioni
  */
 const confirmationMessages = {
-  DELETE: 'DELETE request successful'
+  DELETE: "L'articolo è stato eliminato con successo."
 }
 
 /**
  * Array associativo che tiene traccia dei messaggi d'errore delle varie operazioni.
  */
 const errorMessages = {
-  NOT_FOUND: "The researched article wasn't found.",
-  CAST: 'The id of the requested article is in the wrong format.',
-  NEGATIVE_PAGE: 'Page number must be greater than zero!',
-  NEGATIVE_STEP: 'Step must be greater or equal than zero!',
-  IMAGE_FORMAT: 'The file sent is is not supported!',
-  EMPTY_PATCH: "Can't patch if nothing is sent!",
-  DEFAULT: 'Something went wrong!\nPlease try again later.'
+  NOT_FOUND: "L'articolo richiesto non è stato trovato!",
+  CAST: 'È stato inserito un id articolo errato!',
+  NEGATIVE_PAGE: 'Il numero di pagina deve essere maggiore di zero!',
+  NEGATIVE_STEP:
+    'Il numero di articoli per pagina deve essere maggiore o uguale a zero!',
+  IMAGE_FORMAT: 'Il file inserito è in un formato non supportato!',
+  EMPTY_PATCH: 'Impossibile modificare senza dati!',
+  PROJECT_ID_NOT_FOUND: 'Il progetto inserito non è stato trovato!',
+  DEFAULT: 'Qualcosa è andato storto!\nPer favore riprovare più tardi.'
 }
 
 const thumbnailPath = __dirname + '/../../uploads/'

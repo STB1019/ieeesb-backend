@@ -18,7 +18,7 @@ const articleSchema = new Schema(
       type: String,
       required: [true, 'The article subtitle is required!']
     },
-    projectName: {
+    projectID: {
       type: String,
       required: [
         true,
