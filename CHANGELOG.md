@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/STB1019/ieeesb-backend/compare/v1.9.0...v1.10.0) (2022-12-12)
+
+
+### Features
+
+* docker fucking wokrs ([3af64cc](https://github.com/STB1019/ieeesb-backend/commit/3af64cc47fa52025ae211ac5c634d95b36e39bd3))
+
 # [1.9.0](https://github.com/STB1019/ieeesb-backend/compare/v1.8.0...v1.9.0) (2022-07-12)
 
 ### Features
