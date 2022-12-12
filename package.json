@@ -4,6 +4,7 @@
   "description": "Sito ufficiale dell'IEEEStudentBranchOfBrixia",
   "main": "app.js",
   "scripts": {
+    "dev": "nodemon app.js localhost 8081",
     "test": "mocha --reporter spec",
     "start": "nodemon app.js",
     "prepare": "husky install"
