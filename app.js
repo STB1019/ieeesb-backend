@@ -5,8 +5,10 @@
 // di default di 'NodeJS' quindi non vedo perché non usarli.
 const express = require('express')
 //const cors = require("cors");
+const cookieParser = require('cookie-parser')
 const projectsRoutes = require('./src/routes/projectsRoutes')
 const articlesRoutes = require('./src/routes/articlesRoutes')
+const authRoutes = require('./src/routes/authRoutes')
 
 const app = express()
 const PORT = process.env.PORT || 8081
@@ -23,6 +25,8 @@ app.listen(PORT, console.log(`Server started on port ${PORT}...`))
 //app.use(cors());
 app.use(express.static(__dirname + '/uploads'))
 app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser())
 
+app.use(authRoutes)
 app.use(projectsRoutes)
 app.use(articlesRoutes)
