@@ -1,10 +1,28 @@
-// Esattamente come 'express', 'mongoose' è un framework che ci rende più facile
-// interfacciarci con MongoDB. Proprio come non avremmo bisogno di 'express' ma
-// potremmo utilizzare i pacchetti di default, non avremmo bisogno neanche
-// di 'mongoose', tuttavia entrambi ci semplificano la vita rispetto ai pacchetti
-// di default di 'NodeJS' quindi non vedo perché non usarli.
+/**
+ * Il pacchetto "express" è un framework che ci aiuta ad interfacciarci e a creare un webserver in
+ * pochi semplici passaggi. Anche il pacchetto "mongoose" è un framework, questa volta per
+ * facilitare l'interfacciamento con MongoDB.
+ * L'utilizzo di un framework come express o mongoose non è necessario, potremmo usare i pacchetti
+ * forniti da Node, tuttavia questo ci semplifica la vita non poco.
+ */
 const express = require('express')
-//const cors = require("cors");
+const mongoose = require('mongoose')
+/**
+ * Stringa di connessione per il DB salvato su MongoDB Atlas.
+ */
+const dbURI = require('./config.json').dbUri
+/**
+ * Crea un "middleware" ('https://developer.mozilla.org/en-US/docs/Glossary/Middleware' per sapere
+ * che cos'è un middleware) che permette di gestire le CORS (
+ * 'https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS' per sapere cosa sono e perché sono
+ * utili le Cross-Origin Resource Sharing).
+ * N.B: Da tenere commentato se in development ma necessario rimuovere commento in production (da
+ * capire se è veramente necessaria questa cosa).
+ */
+//const cors = require('cors')
+/**
+ * Altro middleware, questa volta per la gestione dei cookies.
+ */
 const cookieParser = require('cookie-parser')
 const projectsRoutes = require('./src/routes/projectsRoutes')
 const articlesRoutes = require('./src/routes/articlesRoutes')
@@ -26,6 +44,11 @@ app.listen(PORT, console.log(`Server started on port ${PORT}...`))
 app.use(express.static(__dirname + '/uploads'))
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
+
+mongoose.connect(dbURI).then(
+  value => console.log(`DB connected!\n${value}`),
+  reason => console.log(reason)
+)
 
 app.use(authRoutes)
 app.use(projectsRoutes)
