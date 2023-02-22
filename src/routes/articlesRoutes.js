@@ -1,6 +1,6 @@
 const { Router } = require('express')
 const articlesController = require('../controllers/articlesController')
-const requireAuth = require('../middlewares/authMiddleware')
+const authMiddleware = require('../middleware/authMiddleware')
 const multer = require('multer')
 
 const router = Router()
@@ -12,18 +12,22 @@ const upload = multer({
 
 // Associo ad una richiesta di tipo 'DELETE' sulla route '/articles/:id' alla funzione
 // 'deleteArticle' del controller
-router.delete('/articles/:id', requireAuth, articlesController.deleteArticle)
+router.delete(
+  '/articles/:id',
+  authMiddleware.requireAuth,
+  articlesController.deleteArticle
+)
 
 // Associo ad una richiesta di tipo 'GET' sulla route '/articles/:id' e '/articles' alle funzioni
 // 'getArticles' e 'getArticlesById' del controller
-router.get('/articles', requireAuth, articlesController.getArticles)
-router.get('/articles/:id', requireAuth, articlesController.getArticleById)
+router.get('/articles', articlesController.getArticles)
+router.get('/articles/:id', articlesController.getArticleById)
 
 // Associo ad una richiesta di tipo 'POST' sulla route '/articles' alla funzione
 // 'postArticle' del controller
 router.post(
   '/articles',
-  requireAuth,
+  authMiddleware.requireAuth,
   upload.single('thumbnail'),
   articlesController.postArticle
 )
@@ -32,7 +36,7 @@ router.post(
 // 'patchArticle' del controller
 router.patch(
   '/articles/:id',
-  requireAuth,
+  authMiddleware.requireAuth,
   upload.single('thumbnail'),
   articlesController.patchArticle
 )

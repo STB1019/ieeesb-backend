@@ -96,7 +96,7 @@ const controller = {
 
   getLogout: (req, res) => {
     res.cookie('jwt', '', { maxAge: 1 })
-    res.redirect('/')
+    res.status(301).json({ path: '/login' })
   }
 }
 
